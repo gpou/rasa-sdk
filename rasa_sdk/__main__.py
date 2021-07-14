@@ -1,13 +1,18 @@
 import logging
+import json
+import os
 
 from rasa_sdk import utils
 from rasa_sdk.endpoint import create_argument_parser, run
 from rasa_sdk.constants import APPLICATION_ROOT_LOGGER_NAME
+from rasa_sdk.otel import Tracer
 
 
 def main_from_args(args):
     """Run with arguments."""
     logging.getLogger("matplotlib").setLevel(logging.WARN)
+
+    Tracer.init(json.loads(os.getenv('TELEMETRY_CONFIG', "{}")))
 
     utils.configure_colored_logging(args.loglevel)
     utils.configure_file_logging(

@@ -1,8 +1,9 @@
 import argparse
 import logging
 import types
-from typing import List, Text, Union, Optional, Any
+from typing import List, Text, Union, Optional
 from ssl import SSLContext
+from functools import wraps
 
 from sanic import Sanic, response
 from sanic.response import HTTPResponse
@@ -14,6 +15,7 @@ from rasa_sdk.cli.arguments import add_endpoint_arguments
 from rasa_sdk.constants import DEFAULT_SERVER_PORT
 from rasa_sdk.executor import ActionExecutor
 from rasa_sdk.interfaces import ActionExecutionRejection, ActionNotFoundException
+from rasa_sdk.otel import Tracer
 
 logger = logging.getLogger(__name__)
 
@@ -87,6 +89,7 @@ def create_app(
         return response.json(body, status=200)
 
     @app.post("/webhook")
+    @create_root_span()
     async def webhook(request: Request) -> HTTPResponse:
         """Webhook to retrieve action calls."""
         action_call = request.json
@@ -122,6 +125,24 @@ def create_app(
         return response.json(body, status=200)
 
     return app
+
+
+def create_root_span():
+    """Wraps a request handler ensuring that a root span is created
+    """
+
+    def decorator(f):
+        @wraps(f)
+        async def decorated(request, *args, **kwargs):
+            context = Tracer.extract(request.headers)
+            with Tracer.start_span(f"{request.method} {request.path}", context=context):
+                resp = await f(request, *args, **kwargs)
+
+            return resp
+
+        return decorated
+
+    return decorator
 
 
 def run(

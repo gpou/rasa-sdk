@@ -18,6 +18,15 @@ RUN python -m venv /opt/venv && \
   cd /app && \
   poetry install --no-dev --no-interaction
 
+# FIXME: install this dependencies using poetry
+RUN pip install --no-cache-dir opentelemetry-sdk && \
+  pip install --no-cache-dir opentelemetry-instrumentation && \
+  pip install --no-cache-dir opentelemetry-instrumentation-aiohttp-client && \
+  pip install --no-cache-dir opentelemetry-instrumentation-sqlalchemy && \
+  pip install --no-cache-dir opentelemetry-instrumentation-logging && \
+  pip install --no-cache-dir opentelemetry-exporter-jaeger && \
+  pip install --no-cache-dir jaeger-client
+
 # start a new build stage
 FROM python:3.7-slim
 
