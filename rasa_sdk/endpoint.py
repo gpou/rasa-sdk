@@ -10,6 +10,9 @@ from sanic.response import HTTPResponse
 from sanic.request import Request
 from sanic_cors import CORS
 
+from sanic_prometheus import monitor
+from prometheus_client import Counter
+
 from rasa_sdk import utils
 from rasa_sdk.cli.arguments import add_endpoint_arguments
 from rasa_sdk.constants import DEFAULT_SERVER_PORT
@@ -81,6 +84,14 @@ def create_app(
 
     executor = ActionExecutor()
     executor.register_package(action_package_name)
+
+    metrics = {}
+    metrics['ACTION_COUNT'] = Counter(
+        'action_count',
+        'Action Count',
+        ['action_name']
+    )
+    monitor(app, metrics_list=metrics.items()).expose_endpoint()
 
     @app.get("/health")
     async def health(_) -> HTTPResponse:

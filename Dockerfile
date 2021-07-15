@@ -25,7 +25,8 @@ RUN pip install --no-cache-dir opentelemetry-sdk && \
   pip install --no-cache-dir opentelemetry-instrumentation-sqlalchemy && \
   pip install --no-cache-dir opentelemetry-instrumentation-logging && \
   pip install --no-cache-dir opentelemetry-exporter-jaeger && \
-  pip install --no-cache-dir jaeger-client
+  pip install --no-cache-dir jaeger-client && \
+  pip install --no-cache-dir sanic-prometheus
 
 # start a new build stage
 FROM python:3.7-slim
