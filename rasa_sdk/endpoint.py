@@ -1,4 +1,5 @@
 import argparse
+import importlib
 import logging
 import types
 from typing import List, Text, Union, Optional
@@ -18,6 +19,7 @@ from rasa_sdk.cli.arguments import add_endpoint_arguments
 from rasa_sdk.constants import DEFAULT_SERVER_PORT
 from rasa_sdk.executor import ActionExecutor
 from rasa_sdk.interfaces import ActionExecutionRejection, ActionNotFoundException
+from rasa_sdk.metrics import Metrics
 from rasa_sdk.otel import Tracer
 
 logger = logging.getLogger(__name__)
@@ -64,6 +66,7 @@ def create_argument_parser():
 
 def create_app(
     action_package_name: Union[Text, types.ModuleType],
+    metrics_package_name: Union[Text, types.ModuleType],
     cors_origins: Union[Text, List[Text], None] = "*",
     auto_reload: bool = False,
 ) -> Sanic:
@@ -85,13 +88,13 @@ def create_app(
     executor = ActionExecutor()
     executor.register_package(action_package_name)
 
-    metrics = {}
-    metrics['ACTION_COUNT'] = Counter(
-        'action_count',
-        'Action Count',
-        ['action_name']
-    )
-    monitor(app, metrics_list=metrics.items()).expose_endpoint()
+    module_name, _, class_name = metrics_package_name.rpartition(".")
+    m = importlib.import_module(module_name)
+    custom_metrics_klass = getattr(m, class_name, None)
+    metrics_sdk = Metrics()
+    metrics = { **metrics_sdk.get_metrics(), **custom_metrics_klass.get_metrics() }.items()
+
+    monitor(app, metrics_list=metrics).expose_endpoint()
 
     @app.get("/health")
     async def health(_) -> HTTPResponse:
@@ -161,6 +164,7 @@ def create_root_span():
 
 def run(
     action_package_name: Union[Text, types.ModuleType],
+    metrics_package_name: Union[Text, types.ModuleType],
     port: Union[Text, int] = DEFAULT_SERVER_PORT,
     cors_origins: Union[Text, List[Text], None] = "*",
     ssl_certificate: Optional[Text] = None,
@@ -170,7 +174,7 @@ def run(
 ) -> None:
     logger.info("Starting action endpoint server...")
     app = create_app(
-        action_package_name, cors_origins=cors_origins, auto_reload=auto_reload
+        action_package_name, metrics_package_name, cors_origins=cors_origins, auto_reload=auto_reload
     )
     ssl_context = create_ssl_context(ssl_certificate, ssl_keyfile, ssl_password)
     protocol = "https" if ssl_context else "http"
