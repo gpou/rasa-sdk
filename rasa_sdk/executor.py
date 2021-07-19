@@ -386,10 +386,6 @@ class ActionExecutor:
         if action_name:
             logger.debug(f"Received request to run '{action_name}'")
 
-            request.app.metrics['ACTION_COUNT'].labels(
-                action_name
-            ).inc()
-
             action = self.actions.get(action_name)
             if not action:
                 raise ActionNotFoundException(action_name)

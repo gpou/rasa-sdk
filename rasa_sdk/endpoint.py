@@ -114,6 +114,9 @@ def create_app(
             executor.reload()
 
         try:
+            action_name = action_call.get("next_action")
+            if action_name:
+                request.app.metrics['ACTION_COUNT'].labels(action_name).inc()
             result = await executor.run(action_call)
         except ActionExecutionRejection as e:
             logger.debug(e)
