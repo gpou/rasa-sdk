@@ -21,10 +21,8 @@ class Tracer:
 
     @classmethod
     def init(cls, config):
-        service_name = config.get('service_name')
+        service_name = config.get('service_name', 'Rasa')
         exporters = config.get('exporters')
-        if not service_name or not exporters:
-            return
 
         logger.info(f"Starting tracing for {service_name}")
 
@@ -62,7 +60,6 @@ class Tracer:
         if not cls.tracer:
             trace.Span()
 
-        logger.info(f"Start span: {name}")
         span = cls.tracer.start_as_current_span(name, attributes=attributes, context=context)
         return span
 
