@@ -13,6 +13,16 @@ def action_arg(action):
         return action
 
 
+def metrics_arg(metrics):
+    if "/" in metrics:
+        raise argparse.ArgumentTypeError(
+            "Invalid metrics format. Metrics file should be a python module "
+            "and passed with module notation (e.g. directory.metrics)."
+        )
+    else:
+        return metrics
+
+
 def add_endpoint_arguments(parser):
     parser.add_argument(
         "-p",
@@ -53,4 +63,10 @@ def add_endpoint_arguments(parser):
         "--auto-reload",
         help="Enable auto-reloading of modules containing Action subclasses.",
         action="store_true",
+    )
+    parser.add_argument(
+        "--metrics",
+        type=metrics_arg,
+        default=None,
+        help="name of metrics package to be loaded if any"
     )

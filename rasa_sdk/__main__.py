@@ -22,6 +22,7 @@ def main_from_args(args):
 
     run(
         args.actions,
+        args.metrics,
         args.port,
         args.cors,
         args.ssl_certificate,

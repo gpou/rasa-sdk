@@ -10,6 +10,8 @@ import types
 import sys
 import os
 
+from sanic.request import Request
+
 from rasa_sdk.interfaces import Tracker, ActionNotFoundException, Action
 
 from rasa_sdk import utils
