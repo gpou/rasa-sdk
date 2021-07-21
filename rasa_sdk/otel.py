@@ -21,7 +21,7 @@ class Tracer:
 
     @classmethod
     def init(cls, config):
-        service_name = config.get('service_name', 'Rasa')
+        service_name = config.get('service_name', 'Rasa Actions')
         exporters = config.get('exporters')
 
         logger.info(f"Starting tracing for {service_name}")
