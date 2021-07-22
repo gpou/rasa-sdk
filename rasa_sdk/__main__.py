@@ -12,7 +12,7 @@ def main_from_args(args):
     """Run with arguments."""
     logging.getLogger("matplotlib").setLevel(logging.WARN)
 
-    Tracer.init(json.loads(os.getenv('TELEMETRY_CONFIG', "{}")))
+    Tracer.init(json.loads(os.getenv('TELEMETRY_CONFIG_ACTIONS', "{}")))
 
     utils.configure_colored_logging(args.loglevel)
     utils.configure_file_logging(
