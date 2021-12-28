@@ -36,6 +36,22 @@ COPY --from=python_builder /opt/venv /opt/venv
 COPY --from=python_builder /app /app
 ENV PATH="/opt/venv/bin:$PATH"
 
+# Install Kogito JIT Executor to execute and validate DMN models
+RUN mkdir -p /usr/share/man/man1 && \
+  apt-get update && apt-get install -y default-jdk wget git
+
+RUN wget https://ftp.cixug.es/apache/maven/maven-3/3.8.1/binaries/apache-maven-3.8.1-bin.tar.gz && \
+  tar -xf apache-maven-3.8.1-bin.tar.gz -C /usr/local
+
+RUN wget https://github.com/gpou/kogito-apps/archive/jitrunner-improvements.tar.gz && \
+  tar -xf jitrunner-improvements.tar.gz -C /usr/local && \
+  cd /usr/local/kogito-apps-jitrunner-improvements/jitexecutor && \
+  export M2_HOME=/usr/local/apache-maven-3.8.1 && \
+  export M2=$M2_HOME/bin && \
+  export MAVEN_OPTS="-Xms256m -Xmx512m" && \
+  export PATH=$M2:$PATH && \
+  mvn clean package -DskipTests
+
 # update permissions & change user
 RUN chgrp -R 0 /app && chmod -R g=u /app
 USER 1001

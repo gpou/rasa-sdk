@@ -11,7 +11,7 @@ function print_help {
 
 case ${1} in
     start)
-        exec python -m rasa_sdk "${@:2}"
+        exec java -jar /usr/local/kogito-apps-jitrunner-improvements/jitexecutor/jitexecutor-runner/target/jitexecutor-runner-2.0.0-SNAPSHOT-runner.jar & python -m rasa_sdk "${@:2}"
         ;;
     run)
         exec "${@:2}"
