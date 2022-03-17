@@ -11,7 +11,7 @@ function print_help {
 
 case ${1} in
     start)
-        exec python -m rasa_sdk "${@:2}"
+        exec /app/cs-tools/bin/rails server -b 0.0.0.0 & python -m rasa_sdk "${@:2}"
         ;;
     run)
         exec "${@:2}"
