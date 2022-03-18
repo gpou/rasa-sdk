@@ -40,6 +40,8 @@ RUN gpg2 --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E206
 RUN curl -sSL https://get.rvm.io | bash -s stable
 RUN /usr/local/rvm/bin/rvm install 3.0.2
 RUN /usr/local/rvm/bin/rvm alias create default ruby-3.0.2
+RUN echo '[[ -s "/usr/local/rvm/scripts/rvm" ]] && source "/usr/local/rvm/scripts/rvm"' >> /root/.bashrc
+
 
 # copy everything from /opt
 COPY --from=python_builder /opt/venv /opt/venv
