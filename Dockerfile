@@ -31,11 +31,11 @@ RUN pip install --no-cache-dir opentelemetry-sdk && \
 # start a new build stage
 FROM python:3.7-slim
 
-# install ruby
+# install ruby, mysql client, and dependencies
 RUN apt-get update -qq && apt-get install -y g++ gcc autoconf automake bison libc6-dev \
         libffi-dev libgdbm-dev libncurses5-dev libsqlite3-dev libtool \
         libyaml-dev make pkg-config sqlite3 zlib1g-dev libgmp-dev \
-        libreadline-dev libssl-dev gnupg2 procps git curl
+        libreadline-dev libssl-dev gnupg2 procps git curl default-libmysqlclient-dev cmake
 RUN gpg2 --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
 RUN curl -sSL https://get.rvm.io | bash -s stable
 RUN /usr/local/rvm/bin/rvm install 3.0.2
